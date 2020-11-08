@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'NotesCreate',
@@ -40,10 +40,14 @@ export default {
       content: null
     }
   },
+  computed: {
+    ...mapGetters(['currentUser'])
+  },
   methods: {
     ...mapActions(['addNote']),
     createNote () {
       let note = {
+        author: this.currentUser,
         title: this.title,
         content: this.content,
         completed: false

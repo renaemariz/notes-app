@@ -10,7 +10,7 @@ Vue.use(Vuex)
 
 firebase.auth().onAuthStateChanged(user => {
   if (user) {
-    store.commit('setCurrentUser', user)
+    store.commit('setCurrentUser', user.email)
   }
 })
 
@@ -26,7 +26,7 @@ const store = new Vuex.Store({
       commit('setNotes', null)
     },
     getNotes () {
-      db.collection('notes').get()
+      db.collection('notes').where('author', '==' , store.state.currentUser).get()
         .then(querySnapshot => {
           let notes = []
           querySnapshot.forEach(doc => {
@@ -40,9 +40,11 @@ const store = new Vuex.Store({
           })
           store.commit('setNotes', notes)
         })
+        .catch(err => console.log(err))
     },
     addNote ({ commit }, payload) {
       let note = {
+        author: payload.author,
         title: payload.title,
         content: payload.content,
         completed: false
