@@ -5,7 +5,7 @@
       <div class="valign-wrapper row">
         <div class="col s6 m6">
          <div class="input-field col s12">
-            <select @change="filterBy($event)">
+            <select @change="filterBy($event)" v-model="filterByValue">
               <option value="all" selected>All</option>
               <option value="completed">Completed</option>
               <option value="pending">Pending</option>
@@ -23,17 +23,8 @@
       <div class="row" v-if="notes">
         <div class="col s12 m6" v-for="note in notes" :key="note.id">
           <div class="card blue-grey lighten-5">
-            <div class="right-align checkbox-container">
-              <span>
-                <label>
-                  <input type="checkbox" class="filled-in" v-model="note.completed" @change="check(note.id, $event)" />
-                  <span>Done</span>
-                </label>
-              </span>
-            </div>
-            <div class="card-content left-align">
-              <span class="card-title">{{ note.title }}</span>
-              <p>{{ note.content }}</p>
+            <div class="card-content left-align">         
+              <NoteItem :noteItem="note"/>
             </div>
             <div class="card-action">
               <div class="row">
@@ -42,7 +33,7 @@
                     <router-link :to="{ name: 'notes-update', params: { id: note.id }}" class="btn"><i class="material-icons">edit</i></router-link>
                   </div>
                   <div class="col s4 right-align">
-                    <button class="btn red" @click="confirmDelete(note.id)"><i class="material-icons">delete</i></button>
+                    <DeleteBtn @delete="deleteItem(note.id)" />
                   </div>
               </div>
             </div>
@@ -56,12 +47,19 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import db from '@/components/firebaseInit'
+import DeleteBtn from '@/components/views/common/DeleteBtn'
+import NoteItem from './NoteItem'
 
 export default {
   name: 'NotesList',
+  components: {
+    NoteItem,
+    DeleteBtn
+  },
   data () {
     return {
-      notes: []
+      notes: [],
+      filterByValue: 'all'
     }
   },
   computed: {
@@ -80,47 +78,17 @@ export default {
   },
   methods: {
     ...mapActions(['deleteNote', 'getNotes']),
-    check (id, e) {
-      db.collection('notes').doc(id).update({
-        completed: e.target.checked
-      })
-        .then(() => {
-          this.$store.commit('saveNote', {
-            id: id,
-            completed: e.target.checked
-          })
-        })
-        .catch(err => console.log(err))
-    },
-    filterBy (e) {
+    filterBy () {
       this.notes = []
-      const value = e.target.value
-      if (value === 'all') {
+      if (this.filterByValue === 'all') {
         this.notes = this.notesList
         return
       }
-
-      let isCompleted = (value === 'completed')
-      this.notes = this.notesFilterByCompletedStatus(isCompleted)
+      this.notes = this.notesFilterByCompletedStatus((this.filterByValue === 'completed'))
     },
-    confirmDelete (id) {
-      if (confirm('Are you sure to delete?')) {
-        this.deleteNote(id)
-      }
+    deleteItem (id) {
+      this.deleteNote(id)
     }
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h1, h2 {
-  font-weight: normal;
-}
-a {
-  color: #white;
-}
-.checkbox-container {
-  padding: 10px;
-}
-</style>

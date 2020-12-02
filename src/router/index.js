@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import NotesCreate from '@/components/views/notes/NotesCreate'
 import NotesUpdate from '@/components/views/notes/NotesUpdate'
 import NotesList from '@/components/views/notes/NotesList'
-import NotesView from '@/components/views/notes/NotesView'
+import NoteItem from '@/components/views/notes/NoteItem'
 import Login from '@/components/views/auth/Login'
 import Register from '@/components/views/auth/Register'
 import firebase from 'firebase/app'
@@ -34,7 +34,7 @@ const router = new Router({
     {
       path: '/notes/view/:id',
       name: 'notes-view',
-      component: NotesView,
+      component: NoteItem,
       meta: { requiresAuth: true, title: 'View Note' }
     },
     {

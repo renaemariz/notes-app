@@ -56,22 +56,28 @@ const store = new Vuex.Store({
         })
         .catch(err => console.log(err))
     },
-    updateNote ({ commit }, payload) {
-      db.collection('notes').doc(payload.id).update(payload.note)
+    async updateNote ({ commit }, payload) {
+       const update = await db.collection('notes').doc(payload.id).update(payload.note)
         .then(doc => {
           commit('saveNote', payload)
-          router.push({name: 'notes-view', params: { id: payload.id }})
+          console.log("nice")
         })
         .catch(err => console.log(err))
     },
-    deleteNote ({commit}, id) {
-      db.collection('notes').doc(id).get()
-        .then(doc => {
-          doc.ref.delete()
-             .then(() => commit('removeNote', id))
-             .catch(err => console.log(err))
+    isNoteCompleted ({commit}, payload) {
+      db.collection('notes').doc(payload.id).update({
+        completed: payload.completed
+      })
+        .then(() => {
+          commit('isCompletedNote', payload)
         })
         .catch(err => console.log(err))
+    },
+    async deleteNote ({commit}, id) {
+        const note = await db.collection('notes').doc(id).get().catch(err => console.log(err))
+        const delNote = await note.ref.delete()
+                       .then(() => commit('removeNote', id))
+                       .catch(err => console.log(err))
     }
   },
   mutations: {
@@ -84,11 +90,17 @@ const store = new Vuex.Store({
     addNewNote (state, note) {
       state.notesList.push(note)
     },
-    saveNote (state, newNote) {
-     Object.assign(state.notesList.find(note => note.id === newNote.id), newNote.note)
+    saveNote (state, updatedNote) {
+      let index = state.notesList.findIndex(note => note.id === updatedNote.id)
+      state.notesList[index].title = updatedNote.note.title
+      state.notesList[index].content = updatedNote.note.content
+    },
+    isCompletedNote (state, updatedNote) {
+      let index = state.notesList.findIndex(note => note.id === updatedNote.id)
+      state.notesList[index].completed = updatedNote.completed
     },
     removeNote (state, id) {  
-      let index = state.notesList.findIndex(note => note.id == id)      
+      let index = state.notesList.findIndex(note => note.id == id)    
       state.notesList.splice(index, 1)
     }
   },

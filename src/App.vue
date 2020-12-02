@@ -1,7 +1,12 @@
 <template>
   <div id="app">
-    <div id="nav" v-if="currentUser" class="right-align">
-      <router-link to="/login" event="" @click.native.prevent="logout">Logout</router-link>
+    <div id="nav" v-if="currentUser" class="row">
+      <div class="col s6 left-align">
+        <router-link to="/">Notes</router-link>   
+      </div>
+      <div class="col s6 right-align">
+        <router-link to="/login" event="" @click.native.prevent="logout">Logout</router-link>
+      </div>
     </div>
     <router-view/>
   </div>
@@ -54,5 +59,8 @@ body {
 }
 a {
   color: #42b983;
+}
+h1, h2 {
+  font-weight: normal;
 }
 </style>

@@ -1,24 +1,11 @@
 <template>
   <div class="container">
-    <section class="content-header">
-      <div class="row">
-        <div class="col s6 left-align">
-           <router-link to="/" class="btn waves-effect waves-light left-align"><i class="material-icons left">arrow_back</i>Notes</router-link>
-        </div>
-      </div>
-    </section>
-
     <section class="content-body">
       <h2>Edit Note</h2>
       <form @submit.prevent="editNote">
         <div class="row">
           <div class="col s6 left-align">
-            <span>
-              <label>
-                <input type="checkbox" class="filled-in checkbox" v-model="completed"  @change="check(id, $event)"/>
-                <span>Done</span>
-              </label>
-            </span>
+            <CompletedCheckbox @checked="check" :checked="completed" />
           </div>
 
           <div class="col s6 right-align">
@@ -41,6 +28,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import db from '@/components/firebaseInit'
+import CompletedCheckbox from '../common/CompletedCheckbox'
 
 export default {
   name: 'NotesUpdate',
@@ -52,6 +40,9 @@ export default {
       completed: null
     }
   },
+  components: {
+    CompletedCheckbox
+  },
   computed: {
     ...mapGetters(['getNoteById'])
   },
@@ -62,8 +53,11 @@ export default {
     this.content = note.content
     this.completed = note.completed
   },
+  mounted() {
+    M.textareaAutoResize($('#content'));
+  },  
   methods: {
-    ...mapActions(['updateNote']),
+    ...mapActions(['isNoteCompleted', 'updateNote']),
     editNote () {
       let payload = {
         id: this.id,
@@ -72,27 +66,11 @@ export default {
           content: this.content
         }
       }
-      this.updateNote(payload)
+      this.updateNote(payload).then(() => this.$router.push({ name: 'notes-view', params: { id: payload.id } }) )
     },
-    check (id, e) {
-      db.collection('notes').doc(id).update({
-        completed: e.target.checked
-      })
-        .then(() => {
-          this.$store.commit('saveNote', {
-            id: id,
-            completed: e.target.checked
-          })
-        })
-        .catch(err => console.log(err))
-    },
+    check: function(isChecked) {
+      this.isNoteCompleted({ id: this.id, completed: isChecked })
+    }
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h1, h2 {
-  font-weight: normal;
-}
-</style>
