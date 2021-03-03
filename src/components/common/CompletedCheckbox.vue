@@ -2,7 +2,7 @@
   <div class="checkbox-container">
     <span>
       <label>
-        <input type="checkbox" class="filled-in" v-model="isChecked" @change="check()" />
+        <input type="checkbox" class="filled-in " v-model="isChecked" @change="check()" />
         <span>Done</span>
       </label>
     </span>
@@ -20,8 +20,10 @@ export default {
   },
   methods: {
     check() {
-      console.log("noice")
-      this.$emit('checked', false)
+      console.log(this.isChecked)
+      let isChecked = this.isChecked
+      let id = this.id
+      this.$emit('checked', {isChecked, id} )
     }
   },
   created () {

@@ -3,7 +3,7 @@
     <section class="content-header">
       <div class="row">
         <div class="col s6 left-align">
-           <router-link to="/" class="btn waves-effect waves-light left-align"><i class="material-icons left">arrow_back</i>Notes</router-link>
+           <router-link to="/" class="btn waves-effect waves-light left-align"><i class="material-icons left">arrow_back</i>Back</router-link>
         </div>
       </div>
       <h2>New Note</h2>
@@ -52,7 +52,7 @@ export default {
         content: this.content,
         completed: false
       }
-      this.addNote(note)
+      this.addNote(note).then(() => this.$router.push("/"))
     }
   }
 }

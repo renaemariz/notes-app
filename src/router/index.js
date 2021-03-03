@@ -57,7 +57,7 @@ router.beforeEach((to, from, next) => {
   if (requiresAuth && !auth) next({ path: '/login' })
   else if (requiresAuth && auth) next()
   else if (!requiresAuth && !auth) next()
-  else next()
+  else { next(), console.log("here") }
 })
 
 const title = 'Notes App'

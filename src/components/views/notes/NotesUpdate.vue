@@ -1,11 +1,18 @@
 <template>
   <div class="container">
+    <section class="content-header">
+      <div class="row">
+        <div class="col s6 left-align">
+         <router-link to="/" class="btn waves-effect waves-light left-align"><i class="material-icons left">arrow_back</i>Back</router-link>
+        </div>
+      </div>
+    </section>
     <section class="content-body">
       <h2>Edit Note</h2>
       <form @submit.prevent="editNote">
         <div class="row">
           <div class="col s6 left-align">
-            <CompletedCheckbox @checked="check" :checked="completed" />
+            <CompletedCheckbox class="checkbox-container" @checked="checkboxToggled($event)" :id="id" :checked="completed" />
           </div>
 
           <div class="col s6 right-align">
@@ -28,7 +35,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import db from '@/components/firebaseInit'
-import CompletedCheckbox from '../common/CompletedCheckbox'
+import CompletedCheckbox from '@/components/common/CompletedCheckbox'
 
 export default {
   name: 'NotesUpdate',
@@ -43,19 +50,20 @@ export default {
   components: {
     CompletedCheckbox
   },
-  computed: {
-    ...mapGetters(['getNoteById'])
-  },
-  created () {
+  async created () {
     this.id = this.$route.params.id
-    const note = this.getNoteById(this.id)
+    const note =  this.notesList.find(note => note.id === this.id)
+
     this.title = note.title
     this.content = note.content
     this.completed = note.completed
   },
   mounted() {
     M.textareaAutoResize($('#content'));
-  },  
+  },
+  computed: {
+    ...mapGetters(['notesList'])
+  },
   methods: {
     ...mapActions(['isNoteCompleted', 'updateNote']),
     editNote () {
@@ -68,8 +76,8 @@ export default {
       }
       this.updateNote(payload).then(() => this.$router.push({ name: 'notes-view', params: { id: payload.id } }) )
     },
-    check: function(isChecked) {
-      this.isNoteCompleted({ id: this.id, completed: isChecked })
+    checkboxToggled ({isChecked, id}) {
+      this.isNoteCompleted({ id: id, completed: isChecked })
     }
   }
 }
