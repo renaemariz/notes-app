@@ -59,7 +59,7 @@ export default {
     ...mapGetters(['notesList'])
   },
   methods: {
-    ...mapActions(['isNoteCompleted', 'deleteNote', 'getNotes']),
+    ...mapActions(['isNoteCompleted', 'deleteNote']),
     checkboxToggled ({isChecked, id}) {
       this.isNoteCompleted({ id: id, completed: isChecked })
     },

@@ -20,7 +20,6 @@ export default {
   },
   methods: {
     check() {
-      console.log(this.isChecked)
       let isChecked = this.isChecked
       let id = this.id
       this.$emit('checked', {isChecked, id} )
